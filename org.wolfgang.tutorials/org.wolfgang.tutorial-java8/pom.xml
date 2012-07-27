@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>org.wolfgang.tutorials</artifactId>
+		<groupId>org.wolgang</groupId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+	<groupId>org.wolfgang</groupId>
+	<artifactId>org.wolfgang.tutorial-java8</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<name>org.wolfgang.tutorial-java8</name>
+	<url>http://maven.apache.org</url>
+
+	<developers>
+		<developer>
+			<id>d.plaindoux</id>
+			<name>Didier Plaindoux</name>
+			<email>d.plaindoux@free.fr</email>
+			<url>http://d.plaindoux.free.fr</url>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.home.v8>/Library/Java/JavaVirtualMachines/1.8.0-lambda.jdk/Contents/Home/</java.home.v8>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<verbose>true</verbose>
+					<fork>true</fork>
+					<executable>${java.home.v8}/bin/javac</executable>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.7.2</version>
+				<configuration>
+					<verbose>true</verbose>
+					<fork>true</fork>
+					<executable>${java.home.v8}/bin/javac</executable>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

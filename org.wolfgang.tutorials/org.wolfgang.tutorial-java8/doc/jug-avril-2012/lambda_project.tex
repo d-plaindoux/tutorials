@@ -1,0 +1,1015 @@
+\documentclass[xcolor=table]{beamer}
+
+\usepackage{graphicx}
+\usepackage[T1]{fontenc} 
+\usepackage[latin1]{inputenc}
+\usepackage[frenchb]{babel}
+\usepackage{epsdice}
+\usepackage{wrapfig}
+\usepackage{wasysym}
+\usepackage{marvosym}
+
+\usetheme{Boadilla}
+\usecolortheme{crane}
+\setbeamerfont{block title}{size={}}
+\setbeamercovered{transparent}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}{}
+
+\newcommand{\darkgreen}{\color[rgb]{0.133,0.545,0.133}}
+\newcommand{\darkgrey}{\color[rgb]{0.512,0.512,0.512}}
+\newcommand{\coffeebreak}{\Coffeecup\kern-1.02em{\darkgrey\Coffeecup}}
+\newcommand{\breakinframe}{}
+
+\newcommand{\typerule}[2]
+        {
+         \frac{\begin{array}{l}#1\end{array}}
+	      {\begin{array}{l}#2\end{array}}
+        }
+
+\usepackage{listings}
+\lstset{language=Java,
+  keywordstyle=\color[rgb]{0,0,1},
+  commentstyle=\color[rgb]{0.133,0.545,0.133},
+  stringstyle=\color[rgb]{0.627,0.126,0.941},
+  basicstyle=\scriptsize,
+  numbersep=-3pt,                
+  columns=flexible}
+
+\begin{document}
+\title{Le Projet Lambda} 
+\author{Didier Plaindoux}
+\date{26 avril 2012} 
+
+\logo{\includegraphics[scale=0.3]{images/cc.png}}
+
+\begin{frame}
+  \titlepage
+  \centerline{\includegraphics[scale=0.20]{images/toulousejug2.png}}
+\end{frame}
+
+%% ========================================
+
+\logo{}
+ 
+\begin{frame}{\small\tt (who $\rightarrow$ who.aPropos()).apply(new Plaindoux<Didier>())}
+
+Actuellement Responsable R\&D chez Fujitsu Systems Europe
+\begin{itemize}
+\item Architecte et concepteur de la grille de calcul SynfiniWay
+\end{itemize}
+\vspace{1em}
+Open Source et Recherche à titre personnel
+\begin{itemize}
+\item Extension syntaxique d'OCaml au filtrage de forme XML
+\item Framework pour la transformation de données
+\item Langages (Types reguliers, Séparation Type, Classe et Objet)
+\item Réseau de flux de données montant/descendant normalisé
+\end{itemize}
+\end{frame}
+
+%% ========================================
+
+\begin{frame}{}
+
+\begin{center}
+\Large{Nicolaas Govert De Bruijn {\small(9.07.1918 - 17.02.2012)}}
+\end{center}
+
+\vspace{1em}
+\begin{columns}
+  \begin{column}{0.5\textwidth}
+  Il a  introduit une méthode    pour se débarrasser du  problème  des
+  variables liées.  Dans le lambda-calcul,  chaque {\bf indice de De Bruijn}
+  représente une occurrence  d'une variable et   est déterminé par  le
+  nombre de lambdas situés entre cette occurrence et le lambda qui
+  la lie.
+  \end{column}
+
+  \begin{column}{0.3\textwidth}
+    \centerline{\includegraphics[scale=0.35]{images/220px-Nicolaas_de_Bruijn.jpg}}
+  \end{column}
+\end{columns}
+\bigskip
+
+  \begin{exampleblock}{}
+  \centerline{$\lambda x.x (\lambda y.x~y (\lambda z.x~y~z)) \Rightarrow \lambda.0 (\lambda.1~0 (\lambda.2~1~0))$}
+  \end{exampleblock}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}{Historique et Inspirations du Projet Lambda}
+
+Proposition dite "Straw-man" datant de 2009 s'inspirant de:
+\begin{enumerate}
+\item {\it Pizza into Java: translating theory into practice, 1997} \\
+Etude fondatrice de Generic Java proposant la notion de $\lambda$-expressions.
+Les auteurs ne sont autres que Philip Wadler et Martin Odersky
+\item {\it Closures for the Java Programming Language, 2006} \\
+  Introduction de  types fonctionnels,  les $\lambda$-expressions.
+\item {\it Concise Instance Creation Expressions, 2006} \\
+  Proposition d'une simplification syntaxique pour les classes anonymes. 
+\item {\it First Class Methods: Java-style closures, 2007} \\
+  Proposition des $\lambda$-expressions pour Java 7 sans intégration.
+\end{enumerate}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}{}
+\vspace{-2em}
+\includegraphics[scale=0.20]{images/duke-lambda.png}
+
+\vspace{1em}
+\begin{block}{JSR 335}
+  Lambda Expressions for the Java Programming Language
+\end{block}
+
+Introduction du concept de l'abstraction au sein du langage. \\
+Article : {\em State of the  Lambda v4}
+\vspace{2em}
+  
+\begin{block}{JEP 126}
+  Lambda Expressions and Virtual Extension Methods
+\end{block}
+
+Mise en oeuvre de méthodes au niveau des interfaces. \\
+Articles : {\em Interface evolution via virtual extension methods}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}{}
+
+\vspace{4em}
+
+\centerline{\includegraphics[scale=0.20]{images/closures.png}}
+
+\vspace{1em}
+
+\begin{block}{}
+\vspace{1em}
+\centerline{\sf\large Les Lambda Expressions}
+\vspace{1em}
+\end{block}
+
+\vspace{1em}
+
+\begin{enumerate}
+\item Expressivité du langage i.e. concision et lisibilité
+\item Maturité de l'inférence de type introduite dans Java 7
+\item Support pour la parallélisation liée au Fork/Join de Java 7
+\end{enumerate}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}{Les Fermetures (Closures)}
+
+\begin{block}{Fermeture (Wikipedia)}
+  Une fermeture est une   fonction  qui capture des  références à  des
+  variables    libres  dans    l'environnement   lexical. 
+\end{block}
+
+\vspace{1em}
+
+\breakinframe
+
+\begin{block}{Fermeture (Guy Steele) [RE: What's so cool about Scheme?]}
+  Une fermeture est   un objet ayant  une  seule  méthode nommée  {\tt
+    apply}
+\end{block}
+
+\vspace{1em}
+
+\breakinframe
+
+L'intégration des fermetures dans le langage concerne:
+\begin{enumerate}
+\item le langage des types et
+\item le langage des termes
+\end{enumerate}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{Les Interfaces Fonctionnelles}
+
+\begin{block}{Définition (Interface Fonctionnelle)}
+  Interface ayant une et une seule méthode abstraite.
+\end{block}
+
+\breakinframe
+
+Définition reposant essentiellement sur:
+\begin{enumerate}
+\item le type fonctionnel porté par la méthode abstraite
+\item aucune convention de nommage de la méthode e.g. {\tt apply}
+\end{enumerate}
+
+\begin{alertblock}{}
+  \coffeebreak ~ Aucun évolution syntaxique pour le langage des types 
+\end{alertblock}
+
+\breakinframe
+
+\begin{exampleblock}{}
+\begin{lstlisting}  
+  interface Runnable { void run(); }                        
+  interface ActionListener { void actionPerformed(ActionEvent e); } 
+  interface Comparator<T> { int compare(T t1, T t2); }
+  interface Fun<E,R,throws X> { R apply(E e) throws X; }    
+\end{lstlisting}
+\end{exampleblock}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{Extension d'Interface Fonctionnelle}
+
+L'Extension d'Interface Fonctionnelle est Fonctionnelle si et seulement si:
+\begin{enumerate}
+\item Le nom de la méthode abstraite est identique et
+\item Il existe une relation de sous-typage entre les deux spécifications
+\begin{itemize}
+\item Base formelle à partir des travaux de L. Cardelli, B. Pierce etc.
+\item Repose sur les principes de covariance et contravariance 
+\item Existe déjà dans les version précédentes
+\end{itemize}
+\end{enumerate}
+
+\breakinframe \vspace{1em}
+
+\begin{alertblock}{}
+  \coffeebreak ~ Unicité de la méthode abstraite vérifiée à la compilation
+\end{alertblock}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{Extension d'Interface et Sous-Typage (Rappel)}
+
+Soit une interface {\tt FunA}
+\begin{exampleblock}{}  
+\begin{lstlisting}
+  interface FunA { A m(B b) throws E1; }
+\end{lstlisting}
+\end{exampleblock}
+
+et {\tt FunB} une extension de {\tt FunA} 
+\begin{exampleblock}{}  
+\begin{lstlisting}
+  interface FunB extends FunA { C m(D b) throws E2; }
+\end{lstlisting}
+\end{exampleblock}
+
+\vspace{1em}
+
+On dit alors que {\tt FunB {\color{blue}{extends}} FunA} est valide si et seulement si:
+\begin{itemize}
+\item {\tt B} est un sous-type de {\tt D}, 
+\item {\tt C} est un sous-type de {\tt A} et
+\item {\tt E2} est un sous-type de {\tt E1}.
+\end{itemize}
+  
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{Non respect des contraintes de sous-typage}
+
+\begin{exampleblock}{}
+\begin{lstlisting}
+  interface TA {}
+  interface TB extends TA {}
+  interface TC extends TB {}
+
+  interface FunBB { TB apply(TB b); }
+  interface FunBC extends FunBB { TC apply(TB a); }
+  interface FunBA extends FunBB { TA apply(TB a); }
+\end{lstlisting}
+\end{exampleblock}
+
+{\darkgreen $\checked$ Compilation correcte~} concernant {\tt FunBC} \\
+{\color{red} $\times$ Erreur} apply(TB) in FunBA clashes with apply(TB) in FunBB \\
+\hspace{4em}return type TA is not compatible with TB
+\vspace{1em}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{{\tt java.util.functions}}
+
+Interfaces Fonctionnelles utilisées par {\tt java.lang.Iterable}
+
+\vspace{1em}
+
+\begin{block}{}
+\begin{lstlisting}
+  interface Block<T> { void apply(T t); }               // <T> T -> void
+\end{lstlisting}
+\end{block}
+
+\begin{block}{}
+\begin{lstlisting}
+  interface DoubleMapper<T> { double map(T t); }        // <T> T -> double
+  interface IntMapper<T> { int map(T t); }              // <T> T -> int
+  interface LongMapper<T> { long map(T t); }            // <T> T -> long
+  interface Mapper<T, U> { U map(T t); }                // <T,U> T -> U
+\end{lstlisting}
+\end{block}
+
+\begin{block}{}
+\begin{lstlisting}
+  interface Predicate<T> { boolean eval(T t); }         // <T> T -> boolean
+\end{lstlisting}
+\end{block}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{Les $\lambda$-Expressions: Définition Syntaxique}
+
+La syntaxe adoptée est fortement inspirée de C\# et Scala 
+
+\vspace{1em}
+
+\begin{block}{}
+\begin{lstlisting}
+   Lambda  ::= TypeParameters? ArgList "->" Body
+
+   Body    ::= Expression
+             | "{" [ Statement ";" ]* "}"
+
+   ArgList ::= "(" ")"
+             | "(" Type Identifier [ "," Type Identifier ]* ")"
+\end{lstlisting}
+
+\breakinframe
+
+\vspace{-1em}
+
+\begin{lstlisting}
+             | Identifier
+             | "(" Identifier [ "," Identifier ]* ")"
+\end{lstlisting}
+\end{block}
+
+\vspace{1em}
+
+\begin{alertblock}{}
+  \coffeebreak ~ L'inférence de type devient une clef de voute du langage
+\end{alertblock}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{Exemples de $\lambda$-Expressions}
+
+Type des paramètres spécifiés et résultat inféré
+\begin{exampleblock}{}
+\begin{lstlisting}
+  () -> {}                                              // => void
+  (int i) -> { return i + 1; }                          // int => int
+  (int i,int j) -> i + j                                // (int * int) => int
+  (int i) -> (int j) -> i + j                           // int => int => int
+  (List<String> l)-> l.size()                           // List<String> => int
+  (int[] i) -> i.length                                 // int[] => int
+  (int... i) -> i.length                                // int[] => int
+\end{lstlisting}
+\end{exampleblock}
+
+\vspace{1em}
+
+Type des paramètres et du résultat inférés
+\begin{exampleblock}{}
+\begin{lstlisting}
+  i -> i + 1                                            // ? => ?
+  (i,j) -> i + j                                        // (? * ?) => ?
+  i -> j -> i + j                                       // ? => ? => ?
+\end{lstlisting}
+\end{exampleblock}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{$\lambda$-Expressions et Typage}
+
+\begin{block}{Définition (Type d'une $\lambda$-Expressions)}
+  A toute $\lambda$-Expression  doit correspondre dans  le domaine des
+  types une Interface Fonctionnelle
+\end{block}
+
+\vspace{1em}
+
+\begin{exampleblock}{}
+\begin{lstlisting}
+  interface IntIntFun { int apply(int i, int j); }      // (int * int) => int
+\end{lstlisting}
+\end{exampleblock}
+
+\begin{exampleblock}{}
+\begin{lstlisting}
+  final IntIntFun add1 = (int x, int y) -> x + y;                
+  final IntIntFun add2 = (x,y) -> x + y;                
+\end{lstlisting}
+\end{exampleblock}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{Retour sur l'extension: Surcharge vs. Masquage}
+
+
+\begin{exampleblock}{}
+\begin{lstlisting}
+  interface TA {}
+  interface TB extends TA {}
+
+  interface FunBB { TB apply(TB b); }
+  interface FunAB extends FunBB { TB apply(TA c); }
+\end{lstlisting}
+\end{exampleblock}
+
+\begin{exampleblock}{}
+\begin{lstlisting}
+  FunAB bc = (TB a) -> a;
+\end{lstlisting}
+\end{exampleblock}
+
+\breakinframe
+{\color{red} $\times$ Erreur} multiple non-overriding methods found in interface FunAB
+\vspace{1em}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{Retour sur l'extension: Interface Fonctionnelle et Généricité}
+
+Sous-Typage effectif sur les paramètres
+
+\vspace{1em}
+
+\begin{exampleblock}{}
+\begin{lstlisting}
+  interface Relache { 
+    Iterable apply(Iterable<String> l); 
+  }
+
+  interface Specialise extends Relache { 
+    Iterable<String> apply(Iterable l); 
+  }
+\end{lstlisting}
+\end{exampleblock}
+
+\begin{exampleblock}{}
+\begin{lstlisting}
+  final Specialise specialise = l -> l.map(x -> String.valueOf(x));
+  final Relache relache = specialize;
+\end{lstlisting}
+\end{exampleblock}
+
+{\darkgreen $\checked$ Compilation correcte}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{Les $\lambda$-Expressions et les Variables}
+
+\begin{exampleblock}{}
+\begin{lstlisting}
+  // Kingdom of nouns - Steve Yegge
+  interface Fun<E,R> { R apply(E i); }                  // <E,R> E => R
+  interface IntFun extends Fun<Integer,Integer> {}      // int => int
+  interface IntFunFun extends Fun<Integer,IntFun> {}    // int => int => int
+\end{lstlisting}
+\end{exampleblock}
+
+\begin{exampleblock}{}
+\begin{lstlisting}
+  final IntFunFun add2 = x -> y -> x + y;               // Forme currifiée 
+  final IntFun incr = add2.apply(1);                    // et application
+\end{lstlisting}
+\end{exampleblock}
+
+\setbeamercovered{invisible}
+
+\breakinframe
+{\darkgreen $\checked$ Compilation correcte}
+
+\vspace{1em}
+
+\begin{alertblock}{}
+\coffeebreak ~ Quid de la finalité de la variable {\tt x} dans {\tt add2} ?
+\end{alertblock}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{Variable Effectivement Finale}
+
+\begin{block}{Définition (Variable Effectivement Finale)}
+Une variable est dite effectivement finale si dans le bloc de base 
+qui la porte celle ci est initialisée et jamais modifiée.
+\end{block}
+
+\vspace{1em}
+
+Immutabilité des variables capturées dans les $\lambda$-Expressions:
+\begin{enumerate}
+\item Déclarée par l'usage du mot clef {\tt final} ou
+\item Vérifiée par le compilateur
+\end{enumerate}
+
+\vspace{1em}
+
+\begin{alertblock}{}
+  \coffeebreak ~ Variable effectivement finale uniquement pour les $\lambda$-Expressions !
+\end{alertblock}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{Portée de Variable et Usage}
+
+\begin{exampleblock}{}
+\begin{lstlisting}
+  private int i = 100;
+  void bar() {
+    final IntFun add100a = x -> x + this.i;
+    final IntFun add100b = x -> x + i;
+  }
+\end{lstlisting}
+\end{exampleblock}
+{\darkgreen $\checked$ Compilation correcte}
+
+\vspace{1em}
+
+\begin{exampleblock}{}
+\begin{lstlisting}
+  int i = 100;
+  final IntFun add100a = x -> x + this.i;
+  final IntFun add100b = x -> x + i;
+\end{lstlisting}
+\end{exampleblock}
+
+{\darkgreen $\checked$ Compilation correcte}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{Portée de Variable et Surcharge}
+
+\begin{exampleblock}{}
+\begin{lstlisting}
+  private int i = 100;
+  void bar() {
+    final Runnable baz = () -> { int i = 10; }
+  }
+\end{lstlisting}
+\end{exampleblock}
+{\darkgreen $\checked$ Compilation correcte}
+
+\vspace{1em}
+
+\begin{exampleblock}{}
+\begin{lstlisting}
+  int i = 100;
+  final Runnable baz = () -> { int i = 10; }
+\end{lstlisting}
+\end{exampleblock}
+
+{\color{red} $\times$ Erreur} variable i is already defined in method ...
+
+\breakinframe\vspace{1em}
+
+\begin{alertblock}{}
+  \coffeebreak ~ Gestion de la portée dans les $\lambda$-expressions similaire au bloc de base
+\end{alertblock}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{Portée de Variable et Fonction Récursive}
+
+\begin{exampleblock}{}
+\begin{lstlisting}
+  final IntFun factObject = new IntFun() {
+    public int apply(int x) { return x <= 1 ? 1 : x * factObject.apply(x - 1); }
+  };
+\end{lstlisting}
+\end{exampleblock}
+
+{\color{red} $\times$ Erreur} variable factObject might not have been initialize
+
+\breakinframe\vspace{1em}
+
+\begin{exampleblock}{}
+\begin{lstlisting}
+  IntFun factLambda = x -> x <= 1 ? 1 : x * factLambda.apply(x - 1);
+\end{lstlisting}
+\end{exampleblock}
+{\darkgreen $\checked$ Compilation correcte}
+
+\breakinframe\vspace{1em}
+
+\begin{alertblock}{}
+  \coffeebreak ~ Révision du principe de variable définie avant usage (JLS 16.2.2) 
+\end{alertblock}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{Les Références de Méthodes et Constructeurs}
+
+\begin{block}{Définition (Référence de Méthodes et Constructeurs)}
+  Une réference de méthode (resp. de constructeur) est traitée de
+  façon similaire à une $\lambda$-Expression mais elle permet de
+  manipuler une méthode (resp.un constructeur) déjà existante.
+\end{block}
+
+\vspace{1em}
+
+Syntaxe étendue aux références:
+
+\begin{block}{}
+\begin{lstlisting}
+   Expression ::= ...
+                | Expression "::" methodName
+                | ClassType "::" methodName
+                | ClassType "::" new                
+\end{lstlisting}
+\end{block}
+
+\vspace{1em}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{Exemples de Références}
+
+\begin{exampleblock}{}
+\begin{lstlisting}
+  interface Fun0<R> { R apply(); }
+  interface Fun1<E,R> { R apply(E e); }
+
+  public class Cell<C> {
+    private final C value;   
+    public Cell(C value) { this.value = value; }
+    public boolean isNull() { return this.value == null; }
+  }
+\end{lstlisting}
+\end{exampleblock}
+
+\begin{exampleblock}{}
+\begin{lstlisting}
+    Fun1<Integer,Cell<Integer>> factory1 = i -> new Cell<>(i);
+\end{lstlisting}
+\vspace{-1em}\begin{lstlisting}
+    Fun1<Integer,Cell<Integer>> factory2 = Cell<Integer>::new;
+\end{lstlisting}
+\begin{lstlisting}
+    Fun1<Cell<Integer>,Boolean> isNullC1 = c -> c.isNull();
+\end{lstlisting}
+\vspace{-1em}\begin{lstlisting}
+    Fun1<Cell<Integer>,Boolean> isNullC2 = Cell<Integer>::isNull;
+\end{lstlisting}
+\begin{lstlisting}
+    Cell<Integer> cell = factory1.apply(1);
+    Fun0<Boolean> isNullO1 = () -> cell.isNull();
+\end{lstlisting}
+\vspace{-1em}\begin{lstlisting}
+    Fun0<Boolean> isNullO2 = cell::isNull;
+\end{lstlisting}
+\end{exampleblock}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}{A propos de la compilation}
+
+$\lambda$-Expression vs. classe interne anonyme:
+\begin{enumerate}
+\item Capture de {\tt this} excepté dans une méthode {\tt static}.
+\item Compilation équivalente en présence de variables finales
+\begin{itemize}
+\item Constant pour les types primitifs ou 
+\item Constant Pool si c'est une chaîne de caractères
+\item Passage au constructeur sinon
+\end{itemize}
+\item Petite variation en présence de variables effectivement finales
+\begin{itemize}
+\item Passage au constructeur uniquement
+\end{itemize}
+\end{enumerate}
+
+\vspace{1em}
+$\lambda$-Expression uniquement:
+\begin{enumerate}
+\item Lambda Lifting par transcription objet
+\item Pas de gestion de la récursion terminale
+\begin{itemize}
+\item Stack overflow
+\end{itemize}
+\end{enumerate}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}{}
+
+\begin{block}{}
+\vspace{1em}
+\centerline{\sf\large Extension Virtuelle de Méthode}
+\vspace{1em}
+\end{block}
+
+\begin{enumerate}
+\item Interface avec des méthodes ayant une implémentation par défaut
+\item Héritage multiple de fonctionnalités relativement sécurisé
+\item Support pour l'évolution du langage en tenant compte de l'héritage
+\end{enumerate}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{Trait Scala vs. Extension Virtuelle de Methodes Java}
+
+Trait Similarity en Scala
+\begin{exampleblock}{}
+\begin{lstlisting}
+  trait Similarity {
+    def isSimilar(x: Any): Boolean
+    def isNotSimilar(x: Any): Boolean = !isSimilar(x)
+  }
+\end{lstlisting}
+\end{exampleblock}
+\vspace{1em}
+
+Interface Similarity en Java
+\begin{exampleblock}{}
+\begin{lstlisting}
+  interface Similarity {
+    boolean isSimilar(Object o);
+    boolean isNotSimilar(Object o) default { return !isSimilar(o); }
+  }
+\end{lstlisting}
+\end{exampleblock}
+
+\begin{alertblock}{}
+  \coffeebreak ~ Contrairement à Java, le graphe d'héritage est linéarisé dans Scala
+\end{alertblock}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{Extension Virtuelle et Héritage simple}
+
+L'héritage s'applique normalement:
+\begin{itemize}
+\item Possibité de masquer ou
+\item Supprimer la définition par défaut.
+\end{itemize}
+
+\begin{exampleblock}{}
+\begin{lstlisting}
+  interface A { 
+    int getIncr();
+    int calc(int i) default { return i + getCalc(); }; 
+  }
+
+  interface B extends A {
+    int calc(int i) default { return A.super.calc(i) * 2; };
+  }
+
+  interface C extends A {
+    int calc(int i) default none; // /!\ Sur le papier uniquement pour le moment ...
+  }
+\end{lstlisting}
+\end{exampleblock}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{Extension Virtuelle et Héritage multiple}
+
+Héritage multiple implique de potentiels conflits lors de la résolution:
+\begin{itemize}
+\item Définition des classes tout d'abord, les interfaces ensuite
+\item Méthodes surchargées ignorées
+\item Conflit réglé par le développeur
+\end{itemize}
+
+\begin{exampleblock}{}
+\begin{lstlisting}
+  interface D extends A { int calc(int i) default { return i; } }
+
+  class E implements B, D { public int getIncr() { retun 10; } }
+\end{lstlisting}
+\end{exampleblock}
+{\color{red} $\times$ Erreur} class E inherits unrelated defaults for calc(int) from types B and D
+
+\begin{exampleblock}{}
+\begin{lstlisting}
+  class E implements B, D {
+    public int getIncr() { retun 10; }
+    public int calc(int i) { return D.super.calc(i); }
+  }
+\end{lstlisting}
+\end{exampleblock}
+\end{frame}
+
+%% ========================================
+
+\begin{frame}{}
+
+\centerline{\includegraphics[scale=1.4]{images/leloop_sticker.png}}
+
+\vspace{1em}
+
+\begin{block}{}
+\vspace{1em}
+\centerline{\sf\large Petite Pause Récréative}
+\vspace{1em}
+\end{block}
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{Le Langage BrainF*ck}
+
+\begin{center}
+\small\rowcolors{2}{gray!20}{}
+\begin{tabular}{cl}
+\hline Code & Signification \\\hline
+> & Incrémente le pointeur.\\
+< & Décrémente le pointeur.\\
++ & Incrémente l'octet pointé.\\
+- & Décrémente l'octet pointé.\\
+. & Sortie de l'octet pointé (valeur ASCII).\\
+, & Entrée d'un octet dans l'octet pointé (valeur ASCII).\\
+\verb|[| & Saute après le \verb|]|  correspondant si l'octet pointé est à 0.\\
+\verb|]| & Retourne après l'instruction \verb|[| si l'octet pointé est différent de 0.\\
+\end{tabular}
+\end{center}
+
+\vspace{1em}
+
+\begin{exampleblock}{Command 'cat' avec EOF == -1}
+\begin{lstlisting}
+,+[-.,+]                           
+\end{lstlisting}
+\end{exampleblock}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{BrainF*ck (1/3)}
+
+\begin{lstlisting}
+  // Machine virtuelle BrainF*ck 
+  public final class Runtime {
+    private final PrintStream out;
+    private final InputStream in;
+    private final byte[] memory;
+    private final int cursor;
+  
+    public Runtime(PrintStream out, InputStream in, byte[] memory, int cursor) {
+      this.out = out; this.in = in;
+      this.memory = memory; this.cursor = cursor;
+    }
+
+    private Runtime set(int v) { memory[cursor] = (byte)v; return this; }
+    public boolean isZero() { return memory[cursor] == 0; }
+    public Runtime right() { return new Runtime(out, in, memory, cursor + 1); }
+    public Runtime left() { return new Runtime(out, in, memory, cursor - 1); }
+    public Runtime incr() { return this.set(memory[cursor] + 1); }
+    public Runtime decr() { return this.set(memory[cursor] - 1); }
+    public Runtime write() { out.print((char)memory[cursor]); return this;}
+    public Runtime read() throws IOException { return this.set(in.read()); };
+  }
+\end{lstlisting}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{BrainF*ck (2/3)}
+
+\begin{lstlisting}
+  // Code BrainF*ck
+  interface BrainFun {
+    Runtime execute(Runtime env) throws IOException;
+    
+    BrainFun seq(BrainFun fun) default { 
+      return env -> fun.execute(execute(env)); // :equiv: FoG
+    }
+    
+    BrainFun loop() default {
+      return env -> {
+        Runtime currentRuntime = env;
+        while(!currentRuntime.isZero()) {
+          currentRuntime = execute(currentRuntime);
+        }
+        return currentRuntime;
+      };
+    }
+  }
+\end{lstlisting}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}[fragile]{BrainF*ck (3/3)}
+
+\begin{lstlisting}
+  // Compilateur BrainF*ck
+  public static BrainFun compile(byte[] program) {
+    final Stack<BrainFun> code = new Stack<>();
+    code.push(e -> e);
+
+    for(byte instruction: program) {
+      switch (instruction) {
+        case '>': code.push(code.pop().seq(Runtime::right)); break;
+        case '<': code.push(code.pop().seq(Runtime::left)); break;
+        case '+': code.push(code.pop().seq(Runtime::incr)); break;
+        case '-': code.push(code.pop().seq(Runtime::decr)); break;
+        case '.': code.push(code.pop().seq(Runtime::write)); break;
+        case ',': code.push(code.pop().seq(Runtime::read)); break;
+        case '[': code.push(e -> e); break;
+        case ']': final BrainFun loop = code.pop().loop();
+                  code.push(code.pop().seq(loop)); break;
+        default: // Skip
+      }
+    }
+
+    return code.pop();
+  }
+\end{lstlisting}
+
+\end{frame}
+
+%% ========================================
+
+\begin{frame}{Conclusion}
+
+$\lambda$-Expression
+\begin{itemize}
+\item Aucune modification concernant le typage
+\item Repose sur l'inférence de type
+\begin{itemize}
+\item[] Expressivité par la simplication du codage,
+\item[] Programmation par continuation plus naturelle, ...
+\end{itemize}
+\end{itemize}
+
+\vspace{1em}
+
+Extension Virtuelle de Méthodes
+\begin{itemize}
+\item Implémentation par défaut (cf. Mixins et Traits)
+\item Introduction de l'héritage multiple
+\begin{itemize}
+\item[] Ne repose pas sur des technique de linéarisation
+\item[] Gestion des conflits par le développeur
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+% ========================================
+
+\begin{frame}{Questions ?}
+\centerline{\includegraphics[scale=0.6]{images/javaduke.jpg}}
+\end{frame}
+
+\end{document}
+
