@@ -4,7 +4,7 @@ tutorials
 Set of tutorials dedicated to Java and Frameworks.
 
 Java 8 Lambda Expressions
-=========================
+-------------------------
 
 In this first  set of code the  Java 8 lambda expression is  used as a
 basis.  For this purpose  a BrainF_ck semantic operationel interpreter
